@@ -1,0 +1,25 @@
+/Users/hl/projects/ofpeek/platforms/android/ant-build/ofpeek.ap_ \
+ : /Users/hl/projects/ofpeek/platforms/android/res/drawable/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/res/drawable-hdpi/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/res/drawable-ldpi/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/res/drawable-mdpi/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/res/drawable-xhdpi/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/res/values/strings.xml \
+/Users/hl/projects/ofpeek/platforms/android/res/xml/config.xml \
+/Users/hl/projects/ofpeek/platforms/android/ant-build/res/drawable/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/ant-build/res/drawable-hdpi/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/ant-build/res/drawable-ldpi/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/ant-build/res/drawable-mdpi/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/ant-build/res/drawable-xhdpi/icon.png \
+/Users/hl/projects/ofpeek/platforms/android/assets/_where-is-www.txt \
+/Users/hl/projects/ofpeek/platforms/android/assets/www \
+/Users/hl/projects/ofpeek/platforms/android/assets/www/cordova.js \
+/Users/hl/projects/ofpeek/platforms/android/assets/www/cordova_plugins.js \
+/Users/hl/projects/ofpeek/platforms/android/assets/www/css \
+/Users/hl/projects/ofpeek/platforms/android/assets/www/img \
+/Users/hl/projects/ofpeek/platforms/android/assets/www/index.html \
+/Users/hl/projects/ofpeek/platforms/android/assets/www/js \
+/Users/hl/projects/ofpeek/platforms/android/assets/www/css/index.css \
+/Users/hl/projects/ofpeek/platforms/android/assets/www/img/logo.png \
+/Users/hl/projects/ofpeek/platforms/android/assets/www/js/index.js \
+/Users/hl/projects/ofpeek/platforms/android/ant-build/AndroidManifest.xml \
