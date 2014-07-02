@@ -1,34 +1,8 @@
-/*var app = {
-        // Application Constructor
-        initialize: function() {
-            this.bindEvents();
-        },
-        // Bind Event Listeners
-        //
-        // Bind any events that are required on startup. Common events are:
-        // 'load', 'deviceready', 'offline', and 'online'.
-        bindEvents: function() {
-            document.addEventListener('deviceready', this.onDeviceReady, false);
-        },
-        // deviceready Event Handler
-        //
-        // The scope of 'this' is the event. In order to call the 'receivedEvent'
-        // function, we must explicity call 'app.receivedEvent(...);'
-        onDeviceReady: function() {
-            app.receivedEvent('deviceready');
-        },
-        // Update DOM on a Received Event
-        receivedEvent: function(id) {
-            var parentElement = document.getElementById(id);
-            var listeningElement = parentElement.querySelector('.listening');
-            var receivedElement = parentElement.querySelector('.received');
+/*==============================
+2014-06-30
+wenjen sung
+ ==============================*/
 
-            listeningElement.setAttribute('style', 'display:none;');
-            receivedElement.setAttribute('style', 'display:block;');
-
-            console.log('Received Event: ' + id);
-        }
-    };*/
 var my = {
     connection: null,
     connected:false
@@ -44,20 +18,27 @@ var file_login_info = "login.txt";
 document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady(){
+    //alert("onDeviceReady");
     //載入賬戶資訊
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem){
         fileSystem.root.getFile(file_login_info, null, function(fileEntry){
+            $("#message").append("<p>"+fileEntry.toURL()+"</p>");
             fileEntry.file(function(file){
                 var reader = new FileReader();
                 reader.onloadend = function(e){
                     var str = this.result.split("\r\n");
                     if(str.length === 4){
-                        $("#input_servername").attr("value", str[0]);
-                        $("#input_short_hostname").attr("value", str[1]);
-                        $("#input_username").attr("value", str[2]);
-                        $("#input_password").attr("value", str[3]);
+                        BOSH_HOST = "http://"+str[0]+":7070/http-bind/";
+                        SHORT_HOST_NAME = str[1];
+                        LOGON_USER = str[2];
+                        LOGON_PWD = str[3];
+                        $("#input_servername").val(BOSH_HOST);
+                        $("#input_short_hostname").val(SHORT_HOST_NAME);
+                        $("#input_username").val(LOGON_USER);
+                        $("#input_password").val(LOGON_PWD);
                     }else{//沒有預設帳戶或資訊檔格式不對
-
+                        $("#login_message").append("<p>檔案格式錯誤!!</p>");
+                        $("#message").append("<p>檔案格式錯誤!!</p>");
                     }
                 };
                 reader.readAsText(file);
@@ -216,9 +197,11 @@ function handle_message(message){
     return true;
 }
 
-//帳號資訊輸入
+//帳號資訊載入
 function load_login_info(){
     //$(location).attr("href", "login.html");
+    //$("#login_page").load("login.html");
+
     //載入資訊
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem){
         fileSystem.root.getFile(file_login_info, null, function(fileEntry){
@@ -227,11 +210,18 @@ function load_login_info(){
                 reader.onloadend = function(e){
                     var str = this.result.split("\r\n");
                     if(str.length === 4){
-                        $("#input_servername").attr("value", str[0]);
-                        $("#input_short_hostname").attr("value", str[1]);
-                        $("#input_username").attr("value", str[2]);
-                        $("#input_password").attr("value", str[3]);
+                        BOSH_HOST = "http://"+str[0]+":7070/http-bind/";
+                        SHORT_HOST_NAME = str[1];
+                        LOGON_USER = str[2];
+                        LOGON_PWD = str[3];
+                        $("#input_servername").val(BOSH_HOST);
+                        $("#input_short_hostname").val(SHORT_HOST_NAME);
+                        $("#input_username").val(LOGON_USER);
+                        $("#input_password").val(LOGON_PWD);
+                        //alert($("#input_servername").val());
                     }else{//沒有預設帳戶或資訊檔格式不對
+                        $("#login_message").append("<p>檔案格式錯誤</p>");
+                        $("#message").append("<p>檔案讀取格式錯誤</p>");
                     }
                 };
                 reader.readAsText(file);
@@ -282,5 +272,12 @@ function filesystem_fail(error) {
 }
 
 function get_login_file_fail(error){
+    //alert("get_login_file_fail");
     $("#btn_load_login_page").trigger("click");
+    $("#message").append("<p>賬戶資訊不存在</p>");
+}
+
+function error_file_read(error){
+    $("#login_message").append("<p>檔案讀取錯誤</p>");
+    $("#message").append("<p>檔案讀取錯誤</p>");
 }

@@ -1,37 +1,12 @@
-/*var app = {
- // Application Constructor
- initialize: function() {
- this.bindEvents();
- },
- // Bind Event Listeners
- //
- // Bind any events that are required on startup. Common events are:
- // 'load', 'deviceready', 'offline', and 'online'.
- bindEvents: function() {
- document.addEventListener('deviceready', this.onDeviceReady, false);
- },
- // deviceready Event Handler
- //
- // The scope of 'this' is the event. In order to call the 'receivedEvent'
- // function, we must explicity call 'app.receivedEvent(...);'
- onDeviceReady: function() {
- app.receivedEvent('deviceready');
- },
- // Update DOM on a Received Event
- receivedEvent: function(id) {
- var parentElement = document.getElementById(id);
- var listeningElement = parentElement.querySelector('.listening');
- var receivedElement = parentElement.querySelector('.received');
- 
- listeningElement.setAttribute('style', 'display:none;');
- receivedElement.setAttribute('style', 'display:block;');
- 
- console.log('Received Event: ' + id);
- }
- };*/
+/*==============================
+2014-06-30
+wenjen sung
+ ==============================*/
+
+
 var my = {
-connection: null,
-connected:false
+    connection: null,
+    connected:false
 };
 
 var BOSH_HOST = "";//http://192.168.1.238:7070/http-bind/
@@ -44,27 +19,34 @@ var file_login_info = "login.txt";
 document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady(){
+    //alert("onDeviceReady");
     //載入賬戶資訊
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem){
-                             fileSystem.root.getFile(file_login_info, null, function(fileEntry){
-                                                     fileEntry.file(function(file){
-                                                                    var reader = new FileReader();
-                                                                    reader.onloadend = function(e){
-                                                                    var str = this.result.split("\r\n");
-                                                                    if(str.length === 4){
-                                                                    $("#input_servername").attr("value", str[0]);
-                                                                    $("#input_short_hostname").attr("value", str[1]);
-                                                                    $("#input_username").attr("value", str[2]);
-                                                                    $("#input_password").attr("value", str[3]);
-                                                                    }else{//沒有預設帳戶或資訊檔格式不對
-                                                                    
-                                                                    }
-                                                                    };
-                                                                    reader.readAsText(file);
-                                                                    }, filesystem_fail);
-                                                     }, get_login_file_fail);
-                             }, filesystem_fail);
-    
+        fileSystem.root.getFile(file_login_info, null, function(fileEntry){
+            $("#message").append("<p>"+fileEntry.toURL()+"</p>");
+            fileEntry.file(function(file){
+                var reader = new FileReader();
+                reader.onloadend = function(e){
+                    var str = this.result.split("\r\n");
+                    if(str.length === 4){
+                        BOSH_HOST = "http://"+str[0]+":7070/http-bind/";
+                        SHORT_HOST_NAME = str[1];
+                        LOGON_USER = str[2];
+                        LOGON_PWD = str[3];
+                        $("#input_servername").val(BOSH_HOST);
+                        $("#input_short_hostname").val(SHORT_HOST_NAME);
+                        $("#input_username").val(LOGON_USER);
+                        $("#input_password").val(LOGON_PWD);
+                    }else{//沒有預設帳戶或資訊檔格式不對
+                        $("#login_message").append("<p>檔案格式錯誤!!</p>");
+                        $("#message").append("<p>檔案格式錯誤!!</p>");
+                    }
+                };
+                reader.readAsText(file);
+            }, filesystem_fail);
+        }, get_login_file_fail);
+    }, filesystem_fail);
+
 }
 
 
@@ -84,36 +66,36 @@ function connect_server() {
     // callback: 回呼函數這裡我們用來處理連線狀態以便確認連線成功與否
     // wait、hold、route 均為非必要參數，詳細作用請翻閱官方說明及參閱XEP-124規範
     conn.connect(LOGON_USER+"@"+SHORT_HOST_NAME, LOGON_PWD, function (status) {
-                 // 判斷連線狀態，開發者依據目前連線狀態，附加動作或聆聽事件
-                 if(status === Strophe.Status.CONNECTED) {
-                 //連線成功
-                 $("#message").append("<p>Connected!!!</p>");
-                 my.connected = true;
-                 //必須確認已連線狀態，才掛上聆聽事件
-                 conn.addHandler(handle_message,null,"message",'chat');
-                 //送出 new Strophe Builder 物件，即 <presence /> 為XML通訊節的根
-                 conn.send($pres());
-                 }else if(status === Strophe.Status.CONNECTING){
-                 //連線中，尚未確認成功
-                 $("#message").append("<p>Connecting!!!</p>");
-                 }else if(status === Strophe.Status.DISCONNECTED) {
-                 //斷線
-                 $("#message").append("<p>Disconnected!!!</p>");
-                 my.connected = false;
-                 }else if(status === Strophe.Status.DISCONNECTING) {
-                 //斷線中
-                 $("#message").append("<p>Disconnecting!!!</p>");
-                 }else if(status === Strophe.Status.ERROR){
-                 //連線錯誤
-                 $("#message").append("<p>An error has occurred</p>");
-                 }else if(status === Strophe.Status.CONNFAIL){
-                 //連線失敗
-                 $("#message").append("<p>Connection fail!!!</p>");
-                 }else{
-                 //其他不在篩選範圍的狀態顯示
-                 $("#message").append("<p>Status:"+status+"</p>");
-                 }
-                 });
+        // 判斷連線狀態，開發者依據目前連線狀態，附加動作或聆聽事件
+        if(status === Strophe.Status.CONNECTED) {
+            //連線成功
+            $("#message").append("<p>Connected!!!</p>");
+            my.connected = true;
+            //必須確認已連線狀態，才掛上聆聽事件
+            conn.addHandler(handle_message,null,"message",'chat');
+            //送出 new Strophe Builder 物件，即 <presence /> 為XML通訊節的根
+            conn.send($pres());
+        }else if(status === Strophe.Status.CONNECTING){
+            //連線中，尚未確認成功
+            $("#message").append("<p>Connecting!!!</p>");
+        }else if(status === Strophe.Status.DISCONNECTED) {
+            //斷線
+            $("#message").append("<p>Disconnected!!!</p>");
+            my.connected = false;
+        }else if(status === Strophe.Status.DISCONNECTING) {
+            //斷線中
+            $("#message").append("<p>Disconnecting!!!</p>");
+        }else if(status === Strophe.Status.ERROR){
+            //連線錯誤
+            $("#message").append("<p>An error has occurred</p>");
+        }else if(status === Strophe.Status.CONNFAIL){
+            //連線失敗
+            $("#message").append("<p>Connection fail!!!</p>");
+        }else{
+            //其他不在篩選範圍的狀態顯示
+            $("#message").append("<p>Status:"+status+"</p>");
+        }
+    });
     my.connection = conn;
 }
 
@@ -131,9 +113,9 @@ function showTraffic(body, type){
         var console = $("#console").get(0);
         var at_bottom = console.scrollTop >= console.scrollHeight - console.clientHeight;;
         $.each(body.childNodes, function(){
-               //Strophe.serialize(): Render a DOM element and all descendants to a String.
-               $("#console").append("<div class='"+type+"'>"+xml2html(Strophe.serialize(this))+"</div>");
-               });
+            //Strophe.serialize(): Render a DOM element and all descendants to a String.
+            $("#console").append("<div class='"+type+"'>"+xml2html(Strophe.serialize(this))+"</div>");
+        });
         if(at_bottom){
             //讓textarea能自動捲到最下
             console.scrollTop = console.scrollHeight;
@@ -183,8 +165,8 @@ function textToXml(text){
         doc.loadXML(text);
     }else{
         throw {
-        type:"PeekError",
-        message:"No DOMParser object found."
+            type:"PeekError",
+            message:"No DOMParser object found."
         };
     }
     var elem = doc.documentElement;
@@ -216,60 +198,69 @@ function handle_message(message){
     return true;
 }
 
-//帳號資訊輸入
+//帳號資訊載入
 function load_login_info(){
     //$(location).attr("href", "login.html");
+    //$("#login_page").load("login.html");
+
     //載入資訊
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem){
-                             fileSystem.root.getFile(file_login_info, null, function(fileEntry){
-                                                     fileEntry.file(function(file){
-                                                                    var reader = new FileReader();
-                                                                    reader.onloadend = function(e){
-                                                                    var str = this.result.split("\r\n");
-                                                                    if(str.length === 4){
-                                                                    $("#input_servername").attr("value", str[0]);
-                                                                    $("#input_short_hostname").attr("value", str[1]);
-                                                                    $("#input_username").attr("value", str[2]);
-                                                                    $("#input_password").attr("value", str[3]);
-                                                                    }else{//沒有預設帳戶或資訊檔格式不對
-                                                                    }
-                                                                    };
-                                                                    reader.readAsText(file);
-                                                                    }, filesystem_fail);
-                                                     }, filesystem_fail);
-                             }, filesystem_fail);
+        fileSystem.root.getFile(file_login_info, null, function(fileEntry){
+            fileEntry.file(function(file){
+                var reader = new FileReader();
+                reader.onloadend = function(e){
+                    var str = this.result.split("\r\n");
+                    if(str.length === 4){
+                        BOSH_HOST = "http://"+str[0]+":7070/http-bind/";
+                        SHORT_HOST_NAME = str[1];
+                        LOGON_USER = str[2];
+                        LOGON_PWD = str[3];
+                        $("#input_servername").val(BOSH_HOST);
+                        $("#input_short_hostname").val(SHORT_HOST_NAME);
+                        $("#input_username").val(LOGON_USER);
+                        $("#input_password").val(LOGON_PWD);
+                        //alert($("#input_servername").val());
+                    }else{//沒有預設帳戶或資訊檔格式不對
+                        $("#login_message").append("<p>檔案格式錯誤</p>");
+                        $("#message").append("<p>檔案讀取格式錯誤</p>");
+                    }
+                };
+                reader.readAsText(file);
+            }, filesystem_fail);
+        }, filesystem_fail);
+    }, filesystem_fail);
 }
 
 //儲存資訊
 function save_login_info(){
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem){
-                             fileSystem.root.getFile(file_login_info, {create: true, exclusive: false}, function(fileEntry){
-                                                     fileEntry.createWriter(function(fileWriter){
-                                                                            fileWriter.onwriteend = function(e){
-                                                                            $("#login_message").append("<p>資訊儲存完成!</p>");
-                                                                            //重新指派當前帳號變數
-                                                                            BOSH_HOST = "http://"+new_servername+":7070/http-bind/";
-                                                                            SHORT_HOST_NAME = new_short_hostname;
-                                                                            LOGON_USER = new_username;
-                                                                            LOGON_PWD = new_password;
-                                                                            $("#login_message").append("<p>如要使用新帳號連線，請回上頁重新連線</p>");
-                                                                            };
-                                                                            fileWriter.onerror = function(e){
-                                                                            $("#login_message").append("<p>資訊儲存錯誤!"+e.toString()+"</p>");
-                                                                            };
-                                                                            var new_servername = $("#input_servername").val();
-                                                                            var new_short_hostname = $("#input_short_hostname").val();
-                                                                            var new_username = $("#input_username").val();
-                                                                            var new_password = $("#input_password").val();
-                                                                            fileWriter.write(new_servername+"\r\n"+new_short_hostname+"\r\n"+new_username+"\r\n"+new_password);
-                                                                            }, filesystem_fail);
-                                                     }, filesystem_fail);
-                             }, filesystem_fail);
+        fileSystem.root.getFile(file_login_info, {create: true, exclusive: false}, function(fileEntry){
+            fileEntry.createWriter(function(fileWriter){
+                fileWriter.onwriteend = function(e){
+                    $("#login_message").append("<p>資訊儲存完成!</p>");
+                    //重新指派當前帳號變數
+                    BOSH_HOST = "http://"+new_servername+":7070/http-bind/";
+                    SHORT_HOST_NAME = new_short_hostname;
+                    LOGON_USER = new_username;
+                    LOGON_PWD = new_password;
+                    $("#login_message").append("<p>如要使用新帳號連線，請回上頁重新連線</p>");
+                };
+                fileWriter.onerror = function(e){
+                    $("#login_message").append("<p>資訊儲存錯誤!"+e.toString()+"</p>");
+                };
+                var new_servername = $("#input_servername").val();
+                var new_short_hostname = $("#input_short_hostname").val();
+                var new_username = $("#input_username").val();
+                var new_password = $("#input_password").val();
+                fileWriter.write(new_servername+"\r\n"+new_short_hostname+"\r\n"+new_username+"\r\n"+new_password);
+            }, filesystem_fail);
+        }, filesystem_fail);
+    }, filesystem_fail);
 }
 
 //返回前頁
 function back_page(){
-    
+
     $.mobile.back();
 }
 
@@ -282,5 +273,12 @@ function filesystem_fail(error) {
 }
 
 function get_login_file_fail(error){
+    //alert("get_login_file_fail");
     $("#btn_load_login_page").trigger("click");
+    $("#message").append("<p>賬戶資訊不存在</p>");
+}
+
+function error_file_read(error){
+    $("#login_message").append("<p>檔案讀取錯誤</p>");
+    $("#message").append("<p>檔案讀取錯誤</p>");
 }

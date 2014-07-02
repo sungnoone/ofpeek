@@ -1,52 +1,73 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="format-detection" content="telephone=no" />
-    <!-- WARNING: for iOS 7, remove the width=device-width and he ight=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-    <script type="text/javascript" src="cordova.js"></script>
-    <link rel="stylesheet" href="css/jquery.mobile-1.4.2.css">
-    <link rel="stylesheet" href="css/jquery.mobile.structure-1.4.2.css">
-    <link rel="stylesheet" href="css/jquery.mobile.theme-1.4.2.css">
-    <link rel="stylesheet" href="css/jquery.mobile.inline-svg-1.4.2.css">
-    <link rel="stylesheet" href="css/jquery.mobile.inline-png-1.4.2.css">
-    <link rel="stylesheet" href="css/jquery.mobile.icons-1.4.2.css">
-    <link rel="stylesheet" href="css/jquery.mobile.external-png-1.4.2.css">
-    <link rel="stylesheet" href="css/index.css">
-    <script src="js/jquery-2.1.0.js"></script>
-    <script src="js/jquery.mobile-1.4.2.js"></script>
-    <script src="js/strophe.js"></script>
-    <script src="js/index.js"></script>
-    <title>XMPP Connection</title>
-</head>
-<body>
-<div data-role="page" id="page_main" style="margin-top: 20px">
-    <div data-role="header">
-        <h1>XMPP Client</h1>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <script type="text/javascript" src="cordova.js"></script>
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.2.css">
+        <link rel="stylesheet" href="css/jquery.mobile.structure-1.4.2.css">
+        <link rel="stylesheet" href="css/jquery.mobile.theme-1.4.2.css">
+        <link rel="stylesheet" href="css/jquery.mobile.inline-svg-1.4.2.css">
+        <link rel="stylesheet" href="css/jquery.mobile.inline-png-1.4.2.css">
+        <link rel="stylesheet" href="css/jquery.mobile.icons-1.4.2.css">
+        <link rel="stylesheet" href="css/jquery.mobile.external-png-1.4.2.css">
+        <link rel="stylesheet" href="css/index.css">
+        <script src="js/jquery-2.1.0.js"></script>
+        <script src="js/jquery.mobile-1.4.2.js"></script>
+        <script src="js/strophe.js"></script>
+        <script src="js/index.js"></script>
+        <title>XMPP Connection</title>
+
+    </head>
+    <body>
+    <!--主頁-->
+    <div data-role="page" id="page_main" style="margin-top: 20px">
+        <div data-role="header">
+            <h1>XMPP Client</h1>
+        </div>
+        <div id="login_page"></div>
+        <div data-role="content">
+            <form id="button-area">
+                <a id="btn_load_login_page" data-role="button" data-inline="true" data-theme="a" href="#page_login" onclick="load_login_info();">Login_info</a>
+                <a data-role="button" data-inline="true" data-theme="a" href="#" onclick="connect_server();">Connect</a>
+                <a data-role="button" data-inline="true" data-theme="a" href="#" onclick="disconnect_server();">Disconnect</a>
+                <a data-role="button" data-inline="true" data-theme="a" href="#" onclick="btn_clear_msg();">Clear Message</a>
+                <a data-role="button" data-inline="true" data-theme="a" href="#" onclick="btn_send_stanza();">Send Stanza</a>
+            </form>
+            <form>
+                <div id="input_area">
+                    <textarea id="input"></textarea>
+                </div>
+                <div id="console">
+                </div>
+                <div id="message">
+                </div>
+            </form>
+        </div>
     </div>
-    <div data-role="content">
-        <form id="button-area">
-            <a id="btn_load_login_page" data-role="button" data-inline="true" data-theme="a" href="login.html" onclick="load_login_info();">Login_info</a>
-            <a data-role="button" data-inline="true" data-theme="a" href="#" onclick="connect_server();">Connect</a>
-            <a data-role="button" data-inline="true" data-theme="a" href="#" onclick="disconnect_server();">Disconnect</a>
-            <a data-role="button" data-inline="true" data-theme="a" href="#" onclick="btn_clear_msg();">Clear Message</a>
-            <a data-role="button" data-inline="true" data-theme="a" href="#" onclick="btn_send_stanza();">Send Stanza</a>
-            <!--<input type="button" data-role="none" value="Connect" onclick="connect_server();"/>-->
-            <!--<input type="button" data-role="none" value="Disconnect" onclick="disconnect_server();"/>-->
-            <!--<input type="button" data-role="none" value="Clear Message" onclick="btn_clear_msg();"/>-->
-            <!--<input type="button" data-role="none" value="Send Stanza" onclick="btn_send_stanza();"/>-->
-        </form>
-        <form>
-            <div id="input_area">
-                <textarea id="input"></textarea>
-            </div>
-            <div id="console">
-            </div>
-            <div id="message">
-            </div>
-        </form>
+    <!--登入資訊頁-->
+    <div data-role="page" id="page_login" style="margin-top: 20px">
+        <div data-role="header">
+            <a href="#" data-icon="delete" data-theme="b" onclick="back_page();">Back</a>
+            <h1>輸入登入資訊</h1>
+            <a href="#" data-icon="check" data-theme="b" onclick="save_login_info();">Save</a>
+        </div>
+        <div data-role="content">
+            <form id="login_input_area">
+                <label>BOSH主機名稱或IP(請確認XMPP Server支援且已經開啟BOSH功能)</label>
+                <input type="text" id="input_servername" value="" />
+                <label>伺服器短名稱(JID使用)</label>
+                <input type="text" id="input_short_hostname" value="" />
+                <label>登入帳號名稱</label>
+                <input type="text" id="input_username" value="" />
+                <label>登入帳號密碼</label>
+                <input type="password" id="input_password" value="" />
+            </form>
+            <div id="login_message"></div>
+        </div>
     </div>
-</div>
-</body>
+
+    </body>
 </html>
